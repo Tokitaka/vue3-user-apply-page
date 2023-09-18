@@ -11,8 +11,8 @@
         "core-js": "^3.8.3",
         "dotenv": "^16.3.1",
         "vue": "^3.2.13",
-        "vue-router": "^4.0.13",
-        "vuetify": "^3.3.5",
+        "vue-router": "^4.2.4",
+        "vuetify": "^3.3.16",
         "vuex": "^4.0.2"
     },
     "devDependencies": {
@@ -28,7 +28,8 @@
         "eslint-plugin-import": "^2.28.1",
         "eslint-plugin-n": "^16.1.0",
         "eslint-plugin-promise": "^6.1.1",
-        "eslint-plugin-vue": "^9.17.0"
+        "eslint-plugin-vue": "^9.17.0",
+        "vue-cli-plugin-vuetify": "~2.5.8"
     },
     "eslintConfig": {
         "root": true,
