@@ -1,10 +1,14 @@
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import '@mdi/font/css/materialdesignicons.css'
 
 const vuetify = createVuetify({
     components,
     directives,
+    icons: {
+        iconfont: 'mdi', // 아이콘 폰트를 'mdi'로 설정
+    },
     theme: {
         themes: {
             light: {
@@ -15,5 +19,5 @@ const vuetify = createVuetify({
             },
         },
     },
-});
-export default vuetify;
+})
+export default vuetify
