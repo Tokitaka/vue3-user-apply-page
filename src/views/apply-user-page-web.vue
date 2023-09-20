@@ -1,50 +1,25 @@
 <template>
-    <div class="apply-user-page">
+    <div>
         <v-row>
-            <v-col>
-                <div class="safeean-img">
-                    <v-img src="@\assets\logo.png" aspect-ratio="5:5" max-width="73px"></v-img>
-                </div>
-                <div class="intro-card" style="">
-                    <div class="title">세이피안 서비스 신청</div>
-                    <div class="subtitle">
-                        QR스캔 한번으로 안전한 식품정보를 제공받아보세요.
-                        <br />작성 중 어려움이 있으시면 고객만족센터(000-0000)로 연락주세요.
-                    </div>
-                </div>
+            <v-col align="center">
+                <v-img max-width="228" src="@\assets\header_logo_kor.png"></v-img>
             </v-col>
         </v-row>
-
         <v-row>
             <v-col align="center">
                 <v-form ref="form">
-                    <v-card elevation="8" rounded="lg" variant="flat">
-                        <div class="apply-card">
-                            <v-row justify="center" align="center">
-                                <!-- "체인이름-지점이름" -->
-                                <v-col align="center" justify="center" style="">
-                                    <div class="input-title">상호명</div>
+                    <v-card class="px-5" elevation="8" width="70%" rounded="lg" variant="outlined">
+                        <div style="padding: 35px">
+                            <v-row justify="center" align="center" width="70%">
+                                <v-col cols="2" align="center" justify="center">
+                                    <span>상호명</span>
+                                </v-col>
+                                <v-col cols="8" align="center" justify="center">
                                     <v-text-field
                                         v-model="bizName"
-                                        variant="outlined"
-                                        density="compact"
-                                        placeholder="상호명 *"
-                                        prepend-inner-icon=""
-                                        hide-details="none"
-                                        class="custom-text-field"
-                                    >
-                                    </v-text-field>
-                                </v-col>
-                            </v-row>
-                            <v-row justify="center" align="center">
-                                <v-col align="center" justify="center">
-                                    <div class="input-title">대표자</div>
-                                    <v-text-field
-                                        v-model="owner"
                                         density="compact"
                                         variant="outlined"
-                                        placeholder="대표자 *"
-                                        hide-details="none"
+                                        placeholder="'체인이름-지점이름' 으로 입력해주세요"
                                         prepend-inner-icon=""
                                         :rules="[rules.required]"
                                     >
@@ -53,32 +28,49 @@
                             </v-row>
 
                             <v-row justify="center" align="center">
-                                <v-col align="center" justify="center">
-                                    <div class="input-title">사업자등록번호</div>
+                                <v-col cols="2" align="center" justify="center">
+                                    <span>대표자</span>
+                                </v-col>
+                                <v-col cols="8" align="center" justify="center">
+                                    <v-text-field
+                                        v-model="owner"
+                                        density="compact"
+                                        variant="outlined"
+                                        placeholder="대표자를 입력해주세요"
+                                        prepend-inner-icon=""
+                                        :rules="[rules.required]"
+                                    >
+                                    </v-text-field>
+                                </v-col>
+                            </v-row>
+                            <v-row justify="center" align="center">
+                                <v-col cols="2" align="center" justify="center">
+                                    <span>사업자등록번호</span>
+                                </v-col>
+                                <v-col cols="8" align="center" justify="center">
                                     <v-text-field
                                         v-model="bizNum"
                                         density="compact"
                                         variant="outlined"
-                                        placeholder="사업자등록번호 *"
+                                        placeholder="'-'를 제외한 사업자등록번호를 입력해주세요"
                                         prepend-inner-icon=""
-                                        hide-details="none"
                                         :rules="[rules.required]"
                                         @input="validateBizNum"
                                     >
                                     </v-text-field>
                                 </v-col>
                             </v-row>
-
                             <v-row justify="center" align="center">
-                                <v-col align="center" justify="center">
-                                    <div class="input-title">사업자등록증</div>
+                                <v-col cols="2" align="center" justify="center">
+                                    <span>사업자등록증</span>
+                                </v-col>
+                                <v-col cols="8" align="center" justify="center">
                                     <v-file-input
                                         v-model="bizRegistration"
                                         multiple
                                         label="여기를 클릭해주세요"
                                         density="compact"
                                         variant="underlined"
-                                        hide-details="none"
                                         prepend-inner-icon=""
                                         :rules="[rules.required]"
                                     >
@@ -87,56 +79,56 @@
                             </v-row>
 
                             <v-row justify="center" align="center">
-                                <v-col align="center" justify="center">
-                                    <div class="input-title">주소</div>
+                                <v-col cols="2" align="center" justify="center">
+                                    <span>주소</span>
+                                </v-col>
+                                <v-col cols="8" align="center" justify="center">
                                     <v-text-field
                                         v-model="address"
                                         density="compact"
                                         variant="outlined"
-                                        placeholder="주소 *"
-                                        hide-details="none"
+                                        placeholder="주소를 입력해주세요"
                                         prepend-inner-icon=""
                                         :rules="[rules.required]"
                                     >
                                     </v-text-field>
                                 </v-col>
                             </v-row>
-
                             <v-row justify="center" align="center">
-                                <v-col align="center" justify="center">
-                                    <div class="input-title">연락처</div>
+                                <v-col cols="2" align="center" justify="center">
+                                    <span>연락처</span>
+                                </v-col>
+                                <v-col cols="8" align="center" justify="center">
                                     <v-text-field
                                         v-model="phoneNum"
                                         density="compact"
                                         variant="outlined"
                                         placeholder="'-'를 제외한 연락처를 입력해주세요"
                                         prepend-inner-icon=""
-                                        hide-details="none"
                                         :rules="[rules.required]"
                                         @input="validatePhoneNum"
                                     >
                                     </v-text-field>
                                 </v-col>
                             </v-row>
-
                             <v-row justify="center" align="center">
-                                <v-col align="center" justify="center">
-                                    <div class="input-title">이메일</div>
+                                <v-col cols="2" align="center" justify="center">
+                                    <span>이메일</span>
+                                </v-col>
+                                <v-col cols="8" align="center" justify="center">
                                     <v-text-field
                                         v-model="email"
                                         type="email"
                                         density="compact"
                                         variant="outlined"
-                                        placeholder="이메일 *"
+                                        placeholder="이메일을 입력해주세요"
                                         prepend-inner-icon=""
-                                        hide-details="none"
                                         :rules="[rules.required, rules.email]"
                                         @input="validateEmail"
                                     >
                                     </v-text-field>
                                 </v-col>
                             </v-row>
-
                             <v-row justify="center" align="center">
                                 <v-col cols="2" align="center" justify="center">
                                     <span>신청 서비스</span>
@@ -195,53 +187,7 @@ export default {
 }
 </script>
 <style>
-/* 모바일 */
-.apply-user-page {
-    width: 95%;
-    margin: 0 auto;
-}
-.intro-content {
-    font-size: 20px;
-}
-.input-title {
-    text-align: start;
-    margin-bottom: 5px;
-}
-.safeean-img {
-}
-.intro-card {
-    margin-top: 7px;
-}
-.intro-card .title {
-    text-align: start;
-    font-weight: 800;
-    font-size: 23px;
-    margin-bottom: 6px;
-}
-.intro-card .subtitle {
-    font-size: 15px;
-    text-align: start;
-}
-.intro-card .text {
-    font-size: 16px;
-    text-align: start;
-}
-.apply-card {
-}
-.custom-text-field {
-    background-color: yellow;
-    color: red;
-}
-/* iphone 14 PRO MAX : width - 428px, iPad Mini : width - 768px  */
-/* 웹버전 */
-@media (min-width: 700px) {
-    .apply-user-page {
-        min-width: 400px;
-        width: 45%;
-        margin: 0 auto;
-    }
-    .intro-content {
-        font-size: 20px;
-    }
+span {
+    font-size: 13px;
 }
 </style>
