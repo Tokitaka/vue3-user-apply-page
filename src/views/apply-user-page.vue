@@ -3,7 +3,7 @@
         <v-row>
             <v-col>
                 <div class="safeean-img">
-                    <v-img src="@\assets\logo.png" aspect-ratio="5:5" max-width="73px"></v-img>
+                    <v-img src="@\assets\ms-icon-70x70.png" max-width="73px"></v-img>
                 </div>
                 <div class="intro-card" style="">
                     <div class="title">세이피안 서비스 신청</div>
@@ -25,13 +25,13 @@
                                 <v-col align="center" justify="center" style="">
                                     <div class="input-title">상호명</div>
                                     <v-text-field
-                                        v-model="bizName"
+                                        v-model="companyName"
                                         variant="outlined"
                                         density="compact"
                                         placeholder="상호명 *"
                                         prepend-inner-icon=""
                                         hide-details="none"
-                                        class="custom-text-field"
+                                        :rules="[rules.required]"
                                     >
                                     </v-text-field>
                                 </v-col>
@@ -40,7 +40,7 @@
                                 <v-col align="center" justify="center">
                                     <div class="input-title">대표자</div>
                                     <v-text-field
-                                        v-model="owner"
+                                        v-model="companyCEO"
                                         density="compact"
                                         variant="outlined"
                                         placeholder="대표자 *"
@@ -56,7 +56,7 @@
                                 <v-col align="center" justify="center">
                                     <div class="input-title">사업자등록번호</div>
                                     <v-text-field
-                                        v-model="bizNum"
+                                        v-model="companyCode"
                                         density="compact"
                                         variant="outlined"
                                         placeholder="사업자등록번호 *"
@@ -73,7 +73,7 @@
                                 <v-col align="center" justify="center">
                                     <div class="input-title">사업자등록증</div>
                                     <v-file-input
-                                        v-model="bizRegistration"
+                                        v-model="companyFile"
                                         multiple
                                         label="여기를 클릭해주세요"
                                         density="compact"
@@ -90,7 +90,7 @@
                                 <v-col align="center" justify="center">
                                     <div class="input-title">주소</div>
                                     <v-text-field
-                                        v-model="address"
+                                        v-model="companyAddr"
                                         density="compact"
                                         variant="outlined"
                                         placeholder="주소 *"
@@ -106,7 +106,7 @@
                                 <v-col align="center" justify="center">
                                     <div class="input-title">연락처</div>
                                     <v-text-field
-                                        v-model="phoneNum"
+                                        v-model="companyTEL"
                                         density="compact"
                                         variant="outlined"
                                         placeholder="'-'를 제외한 연락처를 입력해주세요"
@@ -123,7 +123,7 @@
                                 <v-col align="center" justify="center">
                                     <div class="input-title">이메일</div>
                                     <v-text-field
-                                        v-model="email"
+                                        v-model="companyEmail"
                                         type="email"
                                         density="compact"
                                         variant="outlined"
@@ -142,9 +142,8 @@
                                     <span>신청 서비스</span>
                                 </v-col>
                                 <v-col cols="8" style="display: flex">
-                                    <v-checkbox v-model="isCheckedNormal" label="세이피안"> </v-checkbox>
-                                    <v-checkbox v-model="isCheckedDining" label="세이피안 다이닝">
-                                    </v-checkbox>
+                                    <v-checkbox v-model="food" label="세이피안"> </v-checkbox>
+                                    <v-checkbox v-model="dining" label="세이피안 다이닝"> </v-checkbox>
                                 </v-col>
                             </v-row>
                             <v-btn color="primary" size="large"> 세이피안 서비스 신청하기 </v-btn>
@@ -160,7 +159,7 @@ export default {
     data() {
         return {
             rules: {
-                required: (value) => !!value || '필수 입력 란입니다',
+                required: (value) => !!value || '',
                 email: (value) => {
                     if (value) {
                         // .c 까지 입력하면 block 안됨
@@ -170,15 +169,16 @@ export default {
                     }
                 },
             },
-            bizName: '',
-            owner: '',
-            bizRegistration: '',
-            bizNum: '',
-            phoneNum: '',
-            address: '',
-            email: '',
-            isCheckedNormal: false,
-            isCheckedDining: false,
+            companyName: '',
+            companyCEO: '',
+            companyFile: '',
+            companyCode: '',
+            companyTEL: '',
+            companyAddr: '',
+            companyEmail: '',
+            //serviceType
+            food: false,
+            dining: false,
         }
     },
     methods: {
@@ -210,12 +210,12 @@ export default {
 .safeean-img {
 }
 .intro-card {
-    margin-top: 7px;
+    margin-top: 9px;
 }
 .intro-card .title {
     text-align: start;
     font-weight: 800;
-    font-size: 23px;
+    font-size: 26px;
     margin-bottom: 6px;
 }
 .intro-card .subtitle {
@@ -226,11 +226,8 @@ export default {
     font-size: 16px;
     text-align: start;
 }
-.apply-card {
-}
-.custom-text-field {
-    background-color: yellow;
-    color: red;
+::placeholder {
+    font-size: 15px;
 }
 /* iphone 14 PRO MAX : width - 428px, iPad Mini : width - 768px  */
 /* 웹버전 */
