@@ -28,7 +28,7 @@
                                         v-model="companyName"
                                         variant="outlined"
                                         density="compact"
-                                        placeholder="상호명 *"
+                                        placeholder="'상호명-지점'으로 입력해주세요. ex) 세이피안-서면점 "
                                         prepend-inner-icon=""
                                         hide-details="none"
                                         :rules="[rules.required]"
@@ -63,7 +63,7 @@
                                         prepend-inner-icon=""
                                         hide-details="none"
                                         :rules="[rules.required]"
-                                        @input="validateBizNum"
+                                        @input="validateCompanyNum"
                                     >
                                     </v-text-field>
                                 </v-col>
@@ -81,6 +81,7 @@
                                         hide-details="none"
                                         prepend-inner-icon=""
                                         :rules="[rules.required]"
+                                        @input="maxFileCount, verifyFileExtension"
                                     >
                                     </v-file-input>
                                 </v-col>
@@ -113,7 +114,7 @@
                                         prepend-inner-icon=""
                                         hide-details="none"
                                         :rules="[rules.required]"
-                                        @input="validatePhoneNum"
+                                        @input="addHyphenToPhone"
                                     >
                                     </v-text-field>
                                 </v-col>
@@ -131,7 +132,6 @@
                                         prepend-inner-icon=""
                                         hide-details="none"
                                         :rules="[rules.required, rules.email]"
-                                        @input="validateEmail"
                                     >
                                     </v-text-field>
                                 </v-col>
@@ -159,19 +159,21 @@ export default {
     data() {
         return {
             rules: {
-                required: (value) => !!value || '',
+                required: (value) => !!value || '필수 항목입니다',
+                // onlyChar: (value) => {
+                //     const regex = /^[a-zA-Z]+$/
+                //     return regex.test(value) ? true : false
+                // },
                 email: (value) => {
-                    if (value) {
-                        // .c 까지 입력하면 block 안됨
-                        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-                        if (!emailRegex.test(value)) return '올바른 이메일 주소 형식이 아닙니다'
-                        return true
-                    }
+                    value?.trim()
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                    return emailRegex.test(value) ? true : '올바른 이메일 주소를 입력하세요.'
                 },
             },
             companyName: '',
             companyCEO: '',
-            companyFile: '',
+            //3개 제한
+            companyFile: [],
             companyCode: '',
             companyTEL: '',
             companyAddr: '',
@@ -182,14 +184,49 @@ export default {
         }
     },
     methods: {
-        validateBizNum() {
-            this.bizNum = this.bizNum.replace(/[^0-9]/g, '')
-            if (this.bizNum.length > 10) {
-                this.bizNum = this.bizNum.substring(0, 9)
+        validateCompanyNum() {
+            this.companyCode = this.companyCode.replace(/[^0-9]/g, '')
+            if (this.companyCode.length > 10) {
+                this.companyCode = this.companyCode.substring(0, 9)
             }
         },
-        validatePhoneNum() {
-            this.bizNum = this.bizNum.replace(/[^0-9]/g, '')
+        verifyFileExtension() {
+            const allowExtensions = ['jpg', 'jpeg', 'zip', 'pdf', 'png']
+            let companyFile = this.companyFile
+            for (let i = 0; i < companyFile.length; i++) {
+                const fileName = companyFile[i].name
+                const fileExtension = fileName.slice(fileName.lastIndexOf('.') + 1)
+                if (allowedExtensions.indexOf(fileExtension.toLowerCase()) === -1) {
+                    return '지원하지 않는 파일 형식입니다.'
+                }
+            }
+            return true
+        },
+        maxFileCount() {
+            const maxCount = 3
+            return this.companyFile.length <= maxCount || '파일은 3개까지만 업로드 가능합니다.'
+        },
+        addHyphenToPhone() {
+            // this.form.phone = this.form.phone.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')
+            this.companyTEL = this.companyTEL.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1')
+
+            let _companyTEL = this.companyTEL
+            this.companyTEL = this.companyTEL.trim()
+
+            if (_companyTEL.length < 4) {
+                this.companyTEL = _companyTEL
+            } else if (_companyTEL.length < 7) {
+                this.companyTEL = _companyTEL.slice(0, 3) + '-' + _companyTEL.slice(3)
+            } else if (_companyTEL.length <= 10) {
+                this.companyTEL =
+                    _companyTEL.slice(0, 3) + '-' + _companyTEL.slice(3, 6) + '-' + _companyTEL.slice(6)
+            } else if (_companyTEL.length < 12) {
+                this.companyTEL =
+                    _companyTEL.slice(0, 3) + '-' + _companyTEL.slice(3, 7) + '-' + _companyTEL.slice(7)
+            } else if (_companyTEL.length < 14) {
+                this.companyTEL =
+                    _companyTEL.slice(0, 4) + '-' + _companyTEL.slice(4, 8) + '-' + _companyTEL.slice(8, 12)
+            }
         },
     },
 }
