@@ -73,7 +73,7 @@ export default {
                         console.log('time!!!!!!', this.isOpen)
                         // if (!this.isOpen) return
                         this.ok()
-                    }, this.time * 1000)
+                    }, this.time * 1500)
                 }
             })
         },

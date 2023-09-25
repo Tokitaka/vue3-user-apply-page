@@ -9,7 +9,7 @@
                     <div class="title">세이피안 서비스 신청</div>
                     <div class="subtitle">
                         QR스캔 한번으로 안전한 식품정보를 제공받아보세요.
-                        <br />작성 중 어려움이 있으시면 고객만족센터(000-0000)로 연락주세요.
+                        <br />다른 신청안내문구
                     </div>
                 </div>
             </v-col>
@@ -28,8 +28,9 @@
                                         v-model="form.companyName"
                                         variant="outlined"
                                         density="compact"
+                                        style="font-size: 15px !important"
                                         placeholder="'상호명-지점'으로 입력해주세요. ex) 세이피안-서면점 "
-                                        hide-details="none"
+                                        :hide-details="hideDetails"
                                         :rules="[rules.required]"
                                     >
                                     </v-text-field>
@@ -43,7 +44,7 @@
                                         density="compact"
                                         variant="outlined"
                                         placeholder="대표자 *"
-                                        hide-details="none"
+                                        :hide-details="hideDetails"
                                         :rules="[rules.required]"
                                     >
                                     </v-text-field>
@@ -59,7 +60,7 @@
                                         variant="outlined"
                                         placeholder="사업자등록번호 *"
                                         maxlength="10"
-                                        hide-details="none"
+                                        :hide-details="hideDetails"
                                         :rules="[rules.required]"
                                         @input="validateCompanyNum"
                                     >
@@ -72,17 +73,16 @@
                                     <div class="input-title">사업자등록증</div>
                                     <v-file-input
                                         v-model="companyFileOrig"
-                                        multiple
                                         label="여기를 클릭해주세요"
                                         density="compact"
                                         variant="underlined"
                                         clearable
+                                        show-size
                                         accept="image/*, .pdf, .zip"
-                                        hide-details="none"
-                                        max-files="3"
+                                        :hide-details="hideDetails"
                                         :rules="[rules.required]"
-                                        @input="maxFileCount"
                                     >
+                                        <!-- multiple -->
                                     </v-file-input>
                                 </v-col>
                             </v-row>
@@ -95,14 +95,15 @@
                                         density="compact"
                                         variant="outlined"
                                         placeholder="주소 *"
-                                        hide-details="none"
+                                        :hide-details="hideDetails"
                                         prepend-inner-icon=""
                                         :rules="[rules.required]"
+                                        @click="searchAddress"
                                     >
                                     </v-text-field>
                                 </v-col>
                             </v-row>
-
+                            <!-- @click="searchAddress" -->
                             <v-row justify="center" align="center">
                                 <v-col align="center" justify="center">
                                     <div class="input-title">연락처</div>
@@ -112,8 +113,8 @@
                                         variant="outlined"
                                         placeholder="'-'를 제외한 연락처를 입력해주세요"
                                         prepend-inner-icon=""
-                                        hide-details="none"
                                         maxlength="14"
+                                        :hide-details="hideDetails"
                                         :rules="[rules.required]"
                                         @input="addHyphenToPhone"
                                     >
@@ -131,13 +132,14 @@
                                         variant="outlined"
                                         placeholder="이메일 *"
                                         prepend-inner-icon=""
-                                        hide-details="none"
+                                        :hide-details="hideDetails"
                                         :rules="[rules.required, rules.email]"
+                                        style=""
                                     >
                                     </v-text-field>
                                 </v-col>
                             </v-row>
-
+                            <!-- 필수로 변경 -->
                             <v-row justify="center" align="center">
                                 <v-col cols="2" align="center" justify="center">
                                     <span>신청 서비스</span>
@@ -155,18 +157,29 @@
                 <v-btn color="primary" size="large" @click="submitForm"> 세이피안 서비스 신청하기 </v-btn>
             </v-col>
         </v-row>
-        <!-- <informModal ref="inform" :content="informContent" time="3" /> -->
+        <informModal ref="inform" :content="informContent" time="5" />
     </div>
 </template>
 <script>
 import * as utils from '@/utils/functions.js'
 import { _xurl } from '@/settings.js'
+import informModal from '@/components/inform-modal.vue'
 
 export default {
+    components: {
+        informModal,
+    },
     data() {
         return {
             rules: {
                 required: (value) => !!value || '필수 항목입니다',
+                // companyFile: (value) => {
+                //     const maxCount = 1
+                //     if (value.length >= maxCount) {
+                //         this.companyFileOrig = value.slice(0, maxCount)
+                //         // '파일은 3개까지만 업로드 가능합니다.'
+                //     }
+                // },
                 onlyChar: (value) => {
                     const regex = /^[a-zA-Z]+$/
                     return regex.test(value) ? true : false
@@ -176,16 +189,18 @@ export default {
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
                     return emailRegex.test(value) ? true : '올바른 이메일 주소를 입력하세요.'
                 },
+                // checkBox: (value) => !!value,
             },
-            // informContent: '',
             valid: false,
+            informContent: '',
+            hideDetails: 'none',
             companyFileOrig: [],
             form: {
                 companyName: '테스트이름',
                 companyCEO: '테스트이름',
                 companyFile: [],
                 companyCode: '123456789',
-                companyTEL: '테스트이름',
+                companyTEL: '104565487',
                 companyAddr: '테스트이름',
                 companyEmail: '테스트이름@gmail.com',
                 serviceType: {
@@ -197,6 +212,15 @@ export default {
         }
     },
     methods: {
+        searchAddress() {
+            const self = this
+            new window.daum.Postcode({
+                oncomplete: function (data) {
+                    console.log(data.address)
+                    self.form.companyAddr = data.address
+                },
+            }).open()
+        },
         async submitForm() {
             this.$refs.form.validate()
             let areValid = this.valid
@@ -269,45 +293,40 @@ export default {
                 }
                 let submitFormData = await result.json()
                 console.log('submitForm데이터 보기', submitFormData)
+                this.informContent = '신청이 완료되었습니다'
+                this.$refs.inform.inform().then((res) => {})
                 // 신청 완료 페이지 이동
             } else {
                 console.log('유효성 검사 실패')
+                this.hideDetails = 'auto'
                 // this.informContent = '입력한 내용을 다시 확인해주세요'
                 // this.$refs.inform.inform().then((res) => {})
             }
         },
-    },
-    validateCompanyNum() {
-        this.form.companyCode = this.form.companyCode.replace(/[^0-9]/g, '')
-        if (this.form.companyCode.length > 10) {
-            this.form.companyCode = this.form.companyCode.substring(0, 9)
-        }
-    },
-    maxFileCount() {
-        const maxCount = 3
-        return this.form.companyFile.length <= maxCount || '파일은 3개까지만 업로드 가능합니다.'
-    },
-    addHyphenToPhone() {
-        // this.form.phone = this.form.phone.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')
-        this.form.companyTEL = this.form.companyTEL.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1')
-
-        let _companyTEL = this.form.companyTEL
-        this.form.companyTEL = this.form.companyTEL.trim()
-
-        if (_companyTEL.length < 4) {
-            this.form.companyTEL = _companyTEL
-        } else if (_companyTEL.length < 7) {
-            this.form.companyTEL = _companyTEL.slice(0, 3) + '-' + _companyTEL.slice(3)
-        } else if (_companyTEL.length <= 10) {
-            this.companyTEL =
-                _companyTEL.slice(0, 3) + '-' + _companyTEL.slice(3, 6) + '-' + _companyTEL.slice(6)
-        } else if (_companyTEL.length < 12) {
-            this.companyTEL =
-                _companyTEL.slice(0, 3) + '-' + _companyTEL.slice(3, 7) + '-' + _companyTEL.slice(7)
-        } else if (_companyTEL.length < 14) {
-            this.companyTEL =
-                _companyTEL.slice(0, 4) + '-' + _companyTEL.slice(4, 8) + '-' + _companyTEL.slice(8, 12)
-        }
+        validateCompanyNum() {
+            this.form.companyCode = this.form.companyCode.replace(/[^0-9]/g, '')
+            if (this.form.companyCode.length > 10) {
+                this.form.companyCode = this.form.companyCode.substring(0, 9)
+            }
+        },
+        addHyphenToPhone() {
+            this.form.companyTEL = this.form.companyTEL.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1')
+            let _companyTEL = this.form.companyTEL.trim()
+            if (_companyTEL.length < 4) {
+                this.form.companyTEL = _companyTEL
+            } else if (_companyTEL.length < 7) {
+                this.form.companyTEL = _companyTEL.slice(0, 3) + '-' + _companyTEL.slice(3)
+            } else if (_companyTEL.length <= 10) {
+                this.form.companyTEL =
+                    _companyTEL.slice(0, 3) + '-' + _companyTEL.slice(3, 6) + '-' + _companyTEL.slice(6)
+            } else if (_companyTEL.length < 12) {
+                this.form.companyTEL =
+                    _companyTEL.slice(0, 3) + '-' + _companyTEL.slice(3, 7) + '-' + _companyTEL.slice(7)
+            } else if (_companyTEL.length < 14) {
+                this.form.companyTEL =
+                    _companyTEL.slice(0, 4) + '-' + _companyTEL.slice(4, 8) + '-' + _companyTEL.slice(8, 12)
+            }
+        },
     },
 }
 </script>
@@ -321,6 +340,7 @@ export default {
     font-size: 20px;
 }
 .input-title {
+    font-weight: 600;
     text-align: start;
     margin-bottom: 5px;
 }
@@ -332,7 +352,7 @@ export default {
 .intro-card .title {
     text-align: start;
     font-weight: 800;
-    font-size: 26px;
+    font-size: 29px;
     margin-bottom: 6px;
 }
 .intro-card .subtitle {
