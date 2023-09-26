@@ -3,13 +3,16 @@
         <v-row>
             <v-col>
                 <div class="safeean-img">
-                    <v-img src="@\assets\ms-icon-70x70.png" max-width="73px"></v-img>
+                    <v-img src="@\assets\safeean_kr_logo.svg" width="190px"></v-img>
                 </div>
                 <div class="intro-card" style="">
                     <div class="title">세이피안 서비스 신청</div>
                     <div class="subtitle">
-                        QR스캔 한번으로 안전한 식품정보를 제공받아보세요.
-                        <br />다른 신청안내문구
+                        안전식품정보서비스에 필요한 기본 정보를 입력해 주세요
+                        <br />세이피안 담당자가 확인하고 가입을 도와드릴게요
+                        <br />
+                        <br />
+                        작성 중 어려움이 있으시면 고객센터(051-791-1224)로 연락주세요
                     </div>
                 </div>
             </v-col>
@@ -18,7 +21,8 @@
         <v-row>
             <v-col align="center">
                 <v-form ref="form" v-model="valid">
-                    <v-card elevation="8" rounded="lg" variant="flat">
+                    <v-container elevation="8" rounded="lg" variant="flat">
+                        <!-- <v-card elevation="8" rounded="lg" variant="flat"> -->
                         <div class="apply-card">
                             <v-row justify="center" align="center">
                                 <!-- "체인이름-지점이름" -->
@@ -82,6 +86,8 @@
                                         :hide-details="hideDetails"
                                         :rules="[rules.required]"
                                     >
+                                        <!-- variant="outlined" -->
+                                        <!-- variant="underlined" -->
                                         <!-- multiple -->
                                     </v-file-input>
                                 </v-col>
@@ -141,18 +147,30 @@
                             </v-row>
                             <!-- 필수로 변경 -->
                             <v-row justify="center" align="center">
-                                <v-col cols="2" align="center" justify="center">
-                                    <span>신청 서비스</span>
-                                </v-col>
-                                <v-col cols="8" style="display: flex">
-                                    <v-checkbox v-model="form.serviceType.food" label="세이피안">
-                                    </v-checkbox>
-                                    <v-checkbox v-model="form.serviceType.dining" label="세이피안 다이닝">
-                                    </v-checkbox>
+                                <v-col
+                                    align="start"
+                                    justify="start"
+                                    style="display: flex; flex-direction: column"
+                                >
+                                    <div class="input-title">신청 서비스</div>
+                                    <div style="display: flex; flex-direction: row">
+                                        <v-checkbox
+                                            v-model="form.serviceType.food"
+                                            label="세이피안"
+                                            justify="center"
+                                        >
+                                        </v-checkbox>
+                                        <v-checkbox
+                                            v-model="form.serviceType.dining"
+                                            label="세이피안 다이닝"
+                                            justify="center"
+                                        >
+                                        </v-checkbox>
+                                    </div>
                                 </v-col>
                             </v-row>
                         </div>
-                    </v-card>
+                    </v-container>
                 </v-form>
                 <v-btn color="primary" size="large" @click="submitForm"> 세이피안 서비스 신청하기 </v-btn>
             </v-col>
@@ -196,13 +214,13 @@ export default {
             hideDetails: 'none',
             companyFileOrig: [],
             form: {
-                companyName: '테스트이름',
-                companyCEO: '테스트이름',
+                companyName: '',
+                companyCEO: '',
                 companyFile: [],
-                companyCode: '123456789',
-                companyTEL: '104565487',
-                companyAddr: '테스트이름',
-                companyEmail: '테스트이름@gmail.com',
+                companyCode: '',
+                companyTEL: '',
+                companyAddr: '',
+                companyEmail: '',
                 serviceType: {
                     food: false,
                     dining: false,
@@ -294,7 +312,9 @@ export default {
                 let submitFormData = await result.json()
                 console.log('submitForm데이터 보기', submitFormData)
                 this.informContent = '신청이 완료되었습니다'
-                this.$refs.inform.inform().then((res) => {})
+                this.$refs.inform.inform().then((res) => {
+                    this.$router.push('/user/complete')
+                })
                 // 신청 완료 페이지 이동
             } else {
                 console.log('유효성 검사 실패')
@@ -333,8 +353,25 @@ export default {
 <style>
 /* 모바일 */
 .apply-user-page {
-    width: 95%;
+    width: 93%;
     margin: 0 auto;
+}
+.intro-card {
+    margin-top: 15px;
+}
+.intro-card .title {
+    text-align: start;
+    font-weight: 800;
+    font-size: 25px;
+    margin-bottom: 15px;
+}
+.intro-card .subtitle {
+    font-size: 14px;
+    text-align: start;
+}
+.intro-card .text {
+    font-size: 16px;
+    text-align: start;
 }
 .intro-content {
     font-size: 20px;
@@ -346,23 +383,7 @@ export default {
 }
 .safeean-img {
 }
-.intro-card {
-    margin-top: 9px;
-}
-.intro-card .title {
-    text-align: start;
-    font-weight: 800;
-    font-size: 29px;
-    margin-bottom: 6px;
-}
-.intro-card .subtitle {
-    font-size: 15px;
-    text-align: start;
-}
-.intro-card .text {
-    font-size: 16px;
-    text-align: start;
-}
+
 ::placeholder {
     font-size: 15px;
 }
