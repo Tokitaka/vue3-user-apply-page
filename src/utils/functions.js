@@ -1,5 +1,5 @@
 import { _xurl } from '@/settings.js'
-// 수정해야 됨
+
 export function uploadImages(data) {
     const { images, options } = data
 

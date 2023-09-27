@@ -1,7 +1,7 @@
 <template>
     <div class="apply-user-page">
         <v-row>
-            <v-col>
+            <v-col style="padding-left: 25px">
                 <div class="safeean-img">
                     <v-img src="@\assets\safeean_kr_logo.svg" width="190px"></v-img>
                 </div>
@@ -81,6 +81,7 @@
                                         density="compact"
                                         variant="underlined"
                                         clearable
+                                        chips
                                         show-size
                                         accept="image/*, .pdf, .zip"
                                         :hide-details="hideDetails"
@@ -162,8 +163,22 @@
                                         </v-checkbox>
                                         <v-checkbox
                                             v-model="form.serviceType.dining"
-                                            label="세이피안 다이닝"
+                                            label="세이피안다이닝"
                                             justify="center"
+                                        >
+                                        </v-checkbox>
+                                        <v-checkbox
+                                            v-model="form.serviceType.food"
+                                            label="세이피안스쿨"
+                                            justify="center"
+                                            :disabled="isDisabled"
+                                        >
+                                        </v-checkbox>
+                                        <v-checkbox
+                                            v-model="form.serviceType.dining"
+                                            label="세이피안밀즈"
+                                            justify="center"
+                                            :disabled="isDisabled"
                                         >
                                         </v-checkbox>
                                     </div>
@@ -175,6 +190,7 @@
                 <v-btn color="primary" size="large" @click="submitForm"> 세이피안 서비스 신청하기 </v-btn>
             </v-col>
         </v-row>
+        <Loader :onLoading="onLoading"></Loader>
         <informModal ref="inform" :content="informContent" time="5" />
     </div>
 </template>
@@ -182,10 +198,12 @@
 import * as utils from '@/utils/functions.js'
 import { _xurl } from '@/settings.js'
 import informModal from '@/components/inform-modal.vue'
+import Loader from '@/components/Loader.vue'
 
 export default {
     components: {
         informModal,
+        Loader,
     },
     data() {
         return {
@@ -207,11 +225,11 @@ export default {
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
                     return emailRegex.test(value) ? true : '올바른 이메일 주소를 입력하세요.'
                 },
-                // checkBox: (value) => !!value,
             },
             valid: false,
             informContent: '',
             hideDetails: 'none',
+            onLoading: false,
             companyFileOrig: [],
             form: {
                 companyName: '',
@@ -227,6 +245,7 @@ export default {
                 },
                 //serviceType
             },
+            isDisabled: true,
         }
     },
     methods: {
@@ -234,7 +253,6 @@ export default {
             const self = this
             new window.daum.Postcode({
                 oncomplete: function (data) {
-                    console.log(data.address)
                     self.form.companyAddr = data.address
                 },
             }).open()
@@ -252,8 +270,6 @@ export default {
                     let resultData = await result.json()
 
                     if (!result.ok || !resultData.isValid === 'false') {
-                        // this.informContent = '이미 존재하는 사업자등록번호 입니다'
-                        // this.$refs.inform.inform().then((res) => {})
                         return
                     }
                 }
@@ -272,8 +288,6 @@ export default {
                     let resultData = await result.json()
 
                     if (!result.ok && !resultData.success) {
-                        // this.informContent = '이미지 업로드에 실패하였습니다'
-                        // this.$refs.inform.inform().then((res) => {})
                         return
                     }
                     console.log('upload된 파일 보기', resultData)
@@ -301,26 +315,21 @@ export default {
                         (key) => this.form.serviceType[key]
                     ),
                 }
+                this.onLoading = true
                 // submitForm
                 let result = await utils.ajaxFetchJson(_xurl.submitForm, 'POST', formData, null, false)
                 console.log('submitForm', result)
                 if (!result.ok) {
-                    // this.informContent = '신청 중 오류가 발생하였습니다'
-                    // this.$refs.inform.inform().then((res) => {})
                     return
                 }
                 let submitFormData = await result.json()
                 console.log('submitForm데이터 보기', submitFormData)
-                this.informContent = '신청이 완료되었습니다'
-                this.$refs.inform.inform().then((res) => {
-                    this.$router.push('/user/complete')
-                })
+                this.onLoading = false
                 // 신청 완료 페이지 이동
+                this.$router.push('/user/complete')
             } else {
                 console.log('유효성 검사 실패')
                 this.hideDetails = 'auto'
-                // this.informContent = '입력한 내용을 다시 확인해주세요'
-                // this.$refs.inform.inform().then((res) => {})
             }
         },
         validateCompanyNum() {
@@ -353,6 +362,7 @@ export default {
 <style>
 /* 모바일 */
 .apply-user-page {
+    min-width: 560px;
     width: 93%;
     margin: 0 auto;
 }
@@ -391,7 +401,6 @@ export default {
 /* 웹버전 */
 @media (min-width: 700px) {
     .apply-user-page {
-        min-width: 400px;
         width: 45%;
         margin: 0 auto;
     }
