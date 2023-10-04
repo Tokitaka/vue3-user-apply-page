@@ -224,24 +224,30 @@
                                             v-model="form.serviceType.food"
                                             label="세이피안"
                                             style="color: black"
+                                            hide-details
                                         >
                                         </v-checkbox>
                                         <v-checkbox
                                             v-model="form.serviceType.dining"
                                             label="세이피안다이닝"
                                             style="color: black"
+                                            hide-details
                                         >
                                         </v-checkbox>
                                         <v-checkbox
                                             v-model="form.serviceType.school"
                                             label="세이피안스쿨"
                                             :disabled="isDisabled"
+                                            indeterminate
+                                            hide-details
                                         >
                                         </v-checkbox>
                                         <v-checkbox
                                             v-model="form.serviceType.meals"
                                             label="세이피안밀즈"
                                             :disabled="isDisabled"
+                                            indeterminate
+                                            hide-details
                                         >
                                         </v-checkbox>
                                     </div>
@@ -327,16 +333,20 @@ export default {
         async submitForm() {
             this.$refs.form.validate()
             let areValid = this.valid
-
+            console.log('valid' + this.valid)
             if (areValid) {
-                // check companyCode
+                this.onLoading = true
+                // 1. check companyCode
                 let data = { companyCode: this.form.companyCode }
                 if (this.form.companyCode) {
                     let result = await utils.ajaxFetchJson(_xurl.checkCompanyCode, 'POST', data, null)
                     console.log('checkCompanyCode', result)
                     let resultData = await result.json()
 
-                    if (!result.ok || !resultData.isValid === 'false') {
+                    if (!result.ok || !resultData.isValid) {
+                        this.informContent = '사업자번호를 확인해주세요'
+                        this.$refs.inform.inform().then((res) => {})
+                        this.onLoading = false
                         return
                     }
                 }
@@ -354,7 +364,11 @@ export default {
                     console.log('image upload', result)
                     let resultData = await result.json()
 
-                    if (!result.ok && !resultData.success) {
+                    if (!result?.ok && !resultData?.success) {
+                        console.log('이미지 업로드 실패')
+                        this.informContent = '잠시후에 다시 시도해주세요'
+                        this.$refs.inform.inform().then((res) => {})
+                        this.onLoading = false
                         return
                     }
                     console.log('upload된 파일 보기', resultData)
@@ -376,24 +390,30 @@ export default {
                     companyFile: this.form.companyFile,
                     companyCode: this.form.companyCode,
                     companyTEL: this.form.companyTEL,
-                    finalCompanyAddr: this.form.companyAddr + ' ' + this.form.detailedAddr,
+                    companyAddr: this.form.companyAddr + ' ' + this.form.detailedAddr,
                     companyEmail: this.form.companyEmail,
                     serviceType: Object.keys(this.form.serviceType).filter(
                         (key) => this.form.serviceType[key]
                     ),
                 }
-                this.onLoading = true
+
                 // submitForm
                 let result = await utils.ajaxFetchJson(_xurl.submitForm, 'POST', formData, null, false)
                 console.log('submitForm', result)
+                this.onLoading = false
+
                 if (!result.ok) {
+                    console.log('폼 제출 실패')
+                    this.informContent = '잠시후에 다시 시도해주세요'
+                    this.$refs.inform.inform().then((res) => {})
+                    this.onLoading = false
                     return
                 }
                 let submitFormData = await result.json()
                 console.log('submitForm데이터 보기', submitFormData)
-                this.onLoading = false
+
                 // 신청 완료 페이지 이동
-                this.$router.push('/user/complete')
+                this.$router.push('/apply/complete')
             } else {
                 console.log('유효성 검사 실패')
                 this.hideDetails = 'auto'
@@ -405,7 +425,6 @@ export default {
             if (this.form.companyCode.length < 10) {
                 return false
             }
-
             // 10자리 제한
             if (this.form.companyCode.length > 10) {
                 this.form.companyCode = this.form.companyCode.substring(0, 9)
@@ -436,7 +455,6 @@ export default {
 <style>
 /* 모바일 */
 .apply-user-page {
-    min-width: 560px;
     width: 93%;
     margin: 0 auto;
 }
@@ -468,6 +486,7 @@ export default {
 .input-title-items {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 }
 
 ::placeholder {
@@ -477,6 +496,7 @@ export default {
 /* 웹버전 */
 @media (min-width: 700px) {
     .apply-user-page {
+        min-width: 560px;
         width: 45%;
         margin: 0 auto;
     }

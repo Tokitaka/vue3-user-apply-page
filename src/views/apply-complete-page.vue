@@ -1,14 +1,15 @@
 <template>
     <div id="apply-complete-page">
-        <div>
-            <transition name="bounce" appear>
+        <transition name="bounce" appear>
+            <div class="v-icon-wrap">
                 <v-icon class="v-icon" size="170" icon="mdi-phone"> </v-icon>
-            </transition>
-        </div>
+            </div>
+        </transition>
+
         <div class="guide-content">
             <span> <b>성공적으로</b> <br /><b>접수되었습니다.</b></span> <br />
             <br />
-            <span style="font-size: 18px">
+            <span class="guide-content-2">
                 기재한 연락처로 3 영업일 이내에 <br />
                 안내 연락이 있을 예정입니다. <br />
             </span>
@@ -26,7 +27,7 @@ export default {}
 </script>
 <style scoped>
 .bounce-enter-active {
-    animation: bounce-in 0.9s;
+    animation: bounce-in 1s;
 }
 @keyframes bounce-in {
     0% {
@@ -52,16 +53,34 @@ export default {}
     padding: 10px;
     margin-bottom: 30px;
 }
-#apply-complete-page .guide-content {
+.guide-content {
     font-size: 20px;
     margin-bottom: 30px;
+}
+.guide-content-2 {
+    font-size: 18px;
 }
 .logo-image {
     margin-top: 80px;
 }
-/* .guide-button {
-    border-radius: 20%;
-    background-color: white;
-    width: 50px;
-} */
+@media (max-height: 560px) {
+    #apply-complete-page {
+        height: 70vh;
+    }
+    .v-icon {
+        margin-top: 5vh;
+        font-size: 140px !important;
+    }
+    .guide-content {
+        font-size: 17px !important;
+    }
+    .guide-content-2 {
+        font-size: 15px !important;
+    }
+    .logo-image {
+        padding: 0;
+        margin: 0;
+        width: 140px !important;
+    }
+}
 </style>

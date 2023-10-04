@@ -8,11 +8,11 @@ const baseUrl = process.env.VUE_APP_BASE_URL
 console.log('baseURL 확인', baseUrl)
 const routes = [
     {
-        path: '/user',
+        path: '/apply',
         component: applyUserPage,
     },
     {
-        path: '/user/complete',
+        path: '/apply/complete',
         component: applyCompletePage,
     },
     {
