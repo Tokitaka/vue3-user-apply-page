@@ -1,0 +1,56 @@
+{
+    "name": "safeean_view_apply",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "serve": "vue-cli-service serve",
+        "build": "vue-cli-service build",
+        "lint": "vue-cli-service lint"
+    },
+    "dependencies": {
+        "@mdi/font": "^7.2.96",
+        "core-js": "^3.8.3",
+        "dotenv": "^16.3.1",
+        "vue": "^3.3.4",
+        "vue-router": "^4.2.4",
+        "vuetify": "^3.3.16",
+        "vuex": "^4.0.2"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.12.16",
+        "@babel/eslint-parser": "^7.12.16",
+        "@typescript-eslint/eslint-plugin": "^6.7.0",
+        "babel-plugin-transform-remove-console": "^6.9.4",
+        "@typescript-eslint/parser": "^6.7.0",
+        "@vue/cli-plugin-babel": "~5.0.0",
+        "@vue/cli-plugin-eslint": "~5.0.0",
+        "@vue/cli-service": "~5.0.0",
+        "eslint": "^8.49.0",
+        "eslint-config-standard": "^17.1.0",
+        "eslint-plugin-import": "^2.28.1",
+        "eslint-plugin-n": "^16.1.0",
+        "eslint-plugin-promise": "^6.1.1",
+        "eslint-plugin-vue": "^9.17.0",
+        "vue-cli-plugin-vuetify": "~2.5.8"
+    },
+    "eslintConfig": {
+        "root": true,
+        "env": {
+            "node": true
+        },
+        "extends": [
+            "plugin:vue/vue3-essential",
+            "eslint:recommended"
+        ],
+        "parserOptions": {
+            "parser": "@babel/eslint-parser"
+        },
+        "rules": {}
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions",
+        "not dead",
+        "not ie 11"
+    ]
+}
