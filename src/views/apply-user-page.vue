@@ -37,6 +37,13 @@
                                         :hide-details="hideDetails"
                                         :rules="[rules.required]"
                                     >
+                                        <template #append>
+                                            <v-expand-x-transition>
+                                                <v-icon v-show="form.companyName" color="success">
+                                                    mdi-check
+                                                </v-icon>
+                                            </v-expand-x-transition>
+                                        </template>
                                     </v-text-field>
                                 </v-col>
                             </v-row>
@@ -51,6 +58,13 @@
                                         :hide-details="hideDetails"
                                         :rules="[rules.required]"
                                     >
+                                        <template #append>
+                                            <v-expand-x-transition>
+                                                <v-icon v-show="form.companyCEO" color="success">
+                                                    mdi-check
+                                                </v-icon>
+                                            </v-expand-x-transition>
+                                        </template>
                                     </v-text-field>
                                 </v-col>
                             </v-row>
@@ -66,8 +80,15 @@
                                         maxlength="10"
                                         :hide-details="hideDetails"
                                         :rules="[rules.required]"
-                                        @input="validateCompanyNum"
+                                        @input="validateCompanyCode"
                                     >
+                                        <template #append>
+                                            <v-expand-x-transition>
+                                                <v-icon v-show="validateCompanyCode()" color="success">
+                                                    mdi-check
+                                                </v-icon>
+                                            </v-expand-x-transition>
+                                        </template>
                                     </v-text-field>
                                 </v-col>
                             </v-row>
@@ -87,9 +108,13 @@
                                         :hide-details="hideDetails"
                                         :rules="[rules.required]"
                                     >
-                                        <!-- variant="outlined" -->
-                                        <!-- variant="underlined" -->
-                                        <!-- multiple -->
+                                        <template #append>
+                                            <v-expand-x-transition>
+                                                <v-icon v-show="companyFileOrig.length" color="success">
+                                                    mdi-check
+                                                </v-icon>
+                                            </v-expand-x-transition>
+                                        </template>
                                     </v-file-input>
                                 </v-col>
                             </v-row>
@@ -107,6 +132,13 @@
                                         :rules="[rules.required]"
                                         @click="searchAddress"
                                     >
+                                        <template #append>
+                                            <v-expand-x-transition>
+                                                <v-icon v-show="form.companyAddr" color="success">
+                                                    mdi-check
+                                                </v-icon>
+                                            </v-expand-x-transition>
+                                        </template>
                                     </v-text-field>
                                 </v-col>
                             </v-row>
@@ -125,6 +157,13 @@
                                         :rules="[rules.required]"
                                         @input="addHyphenToPhone"
                                     >
+                                        <template #append>
+                                            <v-expand-x-transition>
+                                                <v-icon v-show="form.companyTEL" color="success">
+                                                    mdi-check
+                                                </v-icon>
+                                            </v-expand-x-transition>
+                                        </template>
                                     </v-text-field>
                                 </v-col>
                             </v-row>
@@ -143,6 +182,16 @@
                                         :rules="[rules.required, rules.email]"
                                         style=""
                                     >
+                                        <template #append>
+                                            <v-expand-x-transition>
+                                                <v-icon
+                                                    v-show="rules.email(form.companyEmail)"
+                                                    color="success"
+                                                >
+                                                    mdi-check
+                                                </v-icon>
+                                            </v-expand-x-transition>
+                                        </template>
                                     </v-text-field>
                                 </v-col>
                             </v-row>
@@ -154,30 +203,28 @@
                                     style="display: flex; flex-direction: column"
                                 >
                                     <div class="input-title">신청 서비스</div>
-                                    <div style="display: flex; flex-direction: row">
+                                    <div class="input-title-items">
                                         <v-checkbox
                                             v-model="form.serviceType.food"
                                             label="세이피안"
-                                            justify="center"
+                                            style="color: black"
                                         >
                                         </v-checkbox>
                                         <v-checkbox
                                             v-model="form.serviceType.dining"
                                             label="세이피안다이닝"
-                                            justify="center"
+                                            style="color: black"
                                         >
                                         </v-checkbox>
                                         <v-checkbox
-                                            v-model="form.serviceType.food"
+                                            v-model="form.serviceType.school"
                                             label="세이피안스쿨"
-                                            justify="center"
                                             :disabled="isDisabled"
                                         >
                                         </v-checkbox>
                                         <v-checkbox
-                                            v-model="form.serviceType.dining"
+                                            v-model="form.serviceType.meals"
                                             label="세이피안밀즈"
-                                            justify="center"
                                             :disabled="isDisabled"
                                         >
                                         </v-checkbox>
@@ -223,8 +270,9 @@ export default {
                 email: (value) => {
                     value?.trim()
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                    return emailRegex.test(value) ? true : '올바른 이메일 주소를 입력하세요.'
+                    return emailRegex.test(value) ? true : false
                 },
+                //'올바른 이메일 주소를 입력하세요.'
             },
             valid: false,
             informContent: '',
@@ -242,6 +290,8 @@ export default {
                 serviceType: {
                     food: false,
                     dining: false,
+                    school: false,
+                    meals: false,
                 },
                 //serviceType
             },
@@ -332,11 +382,18 @@ export default {
                 this.hideDetails = 'auto'
             }
         },
-        validateCompanyNum() {
+        validateCompanyCode() {
             this.form.companyCode = this.form.companyCode.replace(/[^0-9]/g, '')
+            // 10자리 미만일 때
+            if (this.form.companyCode.length < 10) {
+                return false
+            }
+
+            // 10자리 제한
             if (this.form.companyCode.length > 10) {
                 this.form.companyCode = this.form.companyCode.substring(0, 9)
             }
+            return true
         },
         addHyphenToPhone() {
             this.form.companyTEL = this.form.companyTEL.replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1')
@@ -391,7 +448,9 @@ export default {
     text-align: start;
     margin-bottom: 5px;
 }
-.safeean-img {
+.input-title-items {
+    display: flex;
+    flex-direction: row;
 }
 
 ::placeholder {
