@@ -126,15 +126,31 @@
                                         v-model="form.companyAddr"
                                         density="compact"
                                         variant="outlined"
-                                        placeholder="주소 *"
+                                        placeholder="주소 찾기 *"
                                         :hide-details="hideDetails"
-                                        prepend-inner-icon=""
                                         :rules="[rules.required]"
                                         @click="searchAddress"
                                     >
                                         <template #append>
                                             <v-expand-x-transition>
                                                 <v-icon v-show="form.companyAddr" color="success">
+                                                    mdi-check
+                                                </v-icon>
+                                            </v-expand-x-transition>
+                                        </template>
+                                    </v-text-field>
+                                    <v-spacer style="height: 5px"></v-spacer>
+                                    <v-text-field
+                                        v-model="form.detailedAddr"
+                                        density="compact"
+                                        variant="outlined"
+                                        placeholder="상세주소 입력 *"
+                                        :hide-details="hideDetails"
+                                        :rules="[rules.required]"
+                                    >
+                                        <template #append>
+                                            <v-expand-x-transition>
+                                                <v-icon v-show="form.detailedAddr" color="success">
                                                     mdi-check
                                                 </v-icon>
                                             </v-expand-x-transition>
@@ -286,6 +302,7 @@ export default {
                 companyCode: '',
                 companyTEL: '',
                 companyAddr: '',
+                detailedAddr: '',
                 companyEmail: '',
                 serviceType: {
                     food: false,
@@ -359,7 +376,7 @@ export default {
                     companyFile: this.form.companyFile,
                     companyCode: this.form.companyCode,
                     companyTEL: this.form.companyTEL,
-                    companyAddr: this.form.companyAddr,
+                    finalCompanyAddr: this.form.companyAddr + ' ' + this.form.detailedAddr,
                     companyEmail: this.form.companyEmail,
                     serviceType: Object.keys(this.form.serviceType).filter(
                         (key) => this.form.serviceType[key]
