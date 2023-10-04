@@ -1,16 +1,20 @@
 <template>
     <div id="apply-complete-page">
-        <div class="logo-image">
-            <v-img src="@\assets\safeean_kr_logo.svg" width="170px"></v-img>
-        </div>
         <div>
-            <v-icon class="v-icon" size="170" icon="mdi-phone"> </v-icon>
+            <transition name="bounce" appear>
+                <v-icon class="v-icon" size="170" icon="mdi-phone"> </v-icon>
+            </transition>
         </div>
         <div class="guide-content">
-            <b>신청이 완료되었습니다.</b> <br />
+            <span> <b>성공적으로</b> <br /><b>접수되었습니다.</b></span> <br />
             <br />
-            기재한 연락처로 3 영업일 이내에 <br />
-            안내 연락이 있을 예정입니다. <br />
+            <span style="font-size: 18px">
+                기재한 연락처로 3 영업일 이내에 <br />
+                안내 연락이 있을 예정입니다. <br />
+            </span>
+        </div>
+        <div class="logo-image">
+            <v-img src="@\assets\safeean_kr_logo.svg" width="170px"></v-img>
         </div>
         <!-- <div style="justify-self: flex-end">
             <v-img src="@\assets\safeean_kr_logo.svg" width="190px"></v-img>
@@ -21,8 +25,22 @@
 export default {}
 </script>
 <style scoped>
+.bounce-enter-active {
+    animation: bounce-in 0.9s;
+}
+@keyframes bounce-in {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.25);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
 #apply-complete-page {
-    height: 80vh;
+    height: 90vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -39,7 +57,7 @@ export default {}
     margin-bottom: 30px;
 }
 .logo-image {
-    margin-bottom: 80px;
+    margin-top: 80px;
 }
 /* .guide-button {
     border-radius: 20%;
