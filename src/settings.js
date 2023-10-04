@@ -5,5 +5,8 @@ const _URL = {
     checkCompanyCode: _severBaseURL + `/check/company-code`,
     uploadImage: _severBaseURL + `/common/upload/file`,
     submitForm: _severBaseURL + `/apply/service`,
+    getAppliedCompany: _severBaseURL + `/apply/company/list`,
+    getAppliedDetail: _severBaseURL + `/apply/company/detail`,
+    editApplication: _severBaseURL + `/apply/company/edit`,
 }
 export const _xurl = _URL
