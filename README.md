@@ -1,24 +1,6 @@
 # safeean_view_apply
+![image](https://github.com/Tokitaka/vue3-user-apply-page/assets/110197274/e9efd2a8-9c23-4263-9a94-ba2d8d60f0c1)
+![image](https://github.com/Tokitaka/vue3-user-apply-page/assets/110197274/db3e2dc1-4b8b-4162-b583-eef36d7b781c)
 
-## Project setup
-```
-npm install
-```
+![image](https://github.com/Tokitaka/vue3-user-apply-page/assets/110197274/0a715c83-033a-48dd-bbc3-baef292dbbaf)
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
