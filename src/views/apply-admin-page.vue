@@ -7,17 +7,19 @@
         </v-row>
         <v-row>
             <v-col>
-                <v-pagination
-                    v-model="currentPage"
-                    :length="totalPage"
-                    :total-visible="7"
-                    @click="fetchApplication"
-                ></v-pagination>
+                <v-pagination v-model="currentPage" :length="totalPage" :total-visible="7"></v-pagination>
             </v-col>
         </v-row>
 
         <v-spacer></v-spacer>
-
+        <v-row>
+            <v-col>
+                <v-btn @click="filterByStatus('not_started')">Not Started</v-btn>
+                <v-btn @click="filterByStatus('in_progress')">In Progress</v-btn>
+                <v-btn @click="filterByStatus('completed')">Completed</v-btn>
+                <v-btn @click="filterByStatus('cancelled')">Cancelled</v-btn>
+            </v-col>
+        </v-row>
         <v-row>
             <v-col>
                 <v-table theme="dark" fixed-header density="compact" height="">
@@ -61,6 +63,7 @@ export default {
     data() {
         return {
             appliedCompanyList: [],
+            isFetching: false,
             serviceType: '',
             status: '',
             currentPage: 1,
@@ -68,20 +71,29 @@ export default {
             totalPage: 0,
         }
     },
+    watch: {
+        currentPage(newValue, oldValue) {
+            this.fetchApplication()
+        },
+    },
     created() {
         this.fetchApplication()
     },
     methods: {
         async fetchApplication() {
+            // 중복 API 호출 block
+            if (this.isFetching) return
+            this.isFetching = true
             this.appliedCompanyList = []
 
             let param = {
                 serviceType: '',
-                status: '',
+                status: this.status,
                 page: this.currentPage,
                 pageSize: this.itemsPerPage,
                 order: '',
             }
+            console.log('status in function' + this.status)
             let param_ = `?serviceType=${param.serviceType}&status=${param.status}&page=${param.page}&pageSize=${param.pageSize}&order=${param.order}`
 
             let _headers = {
@@ -89,7 +101,7 @@ export default {
             }
             try {
                 let result = await utils.ajaxFetchJson(
-                    _xurl.getAppliedCompany + '?' + param_,
+                    _xurl.getAppliedCompany + param_,
                     'GET',
                     null,
                     _headers
@@ -101,20 +113,25 @@ export default {
                 this.totalPage = JSONdata.totalPage
                 this.appliedCompanyList.push(...JSONdata.data)
                 // console.log('마이데이터보기', this.appliedCompanyList)
-                return JSONdata
+                return (this.isFetching = false)
             } catch (error) {}
         },
         getStatusClass(status) {
             switch (status) {
-                case 'apply':
+                case 'not_started':
                     return 'awaiting-class'
-                case 'pending':
+                case 'in_progress':
                     return 'in-progress-class'
-                case 'complete':
+                case 'completed':
                     return 'completed-class'
-                case 'cancel':
+                case 'cancelled':
                     return 'cancelled-class'
             }
+        },
+        async filterByStatus(buttonValue) {
+            this.currentPage = 1
+            this.status = buttonValue
+            this.fetchApplication()
         },
     },
 }
