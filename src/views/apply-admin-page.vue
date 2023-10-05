@@ -33,7 +33,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item, index) in appliedCompanyList" :key="item.idx" class="text-left">
+                        <tr
+                            v-for="(item, index) in appliedCompanyList"
+                            :key="item.idx"
+                            class="text-left"
+                            @click="fetchCompanyDetail(item.idx)"
+                        >
                             <td>{{ index + 1 }}</td>
                             <td>{{ item.companyName }}</td>
                             <td :class="getStatusClass(item.status)">
@@ -48,11 +53,13 @@
                 </v-table>
             </v-col>
         </v-row>
+        <detail-dialog :open-modal="openDialog" :applied-company-dtl="appliedCompanyDtl"></detail-dialog>
     </div>
 </template>
 <script>
 import * as utils from '@/utils/functions.js'
 import { _xurl } from '@/settings.js'
+import detailDialog from '@/components/list-detail-dialog.vue'
 import informModal from '@/components/inform-modal.vue'
 import Loader from '@/components/Loader.vue'
 
@@ -60,30 +67,36 @@ import Loader from '@/components/Loader.vue'
 const ADMIN_CODE = process.env.VUE_APP_ADMIN_CODE
 
 export default {
+    components: {
+        detailDialog,
+    },
     data() {
         return {
             appliedCompanyList: [],
-            isFetching: false,
+            appliedCompanyDtl: [],
+            isFetchingAll: false,
+            isFetchingDtl: false,
             serviceType: '',
             status: '',
             currentPage: 1,
             itemsPerPage: 12,
             totalPage: 0,
+            openDialog: false,
         }
     },
     watch: {
         currentPage(newValue, oldValue) {
-            this.fetchApplication()
+            this.fetchAppliedCompanys()
         },
     },
     created() {
-        this.fetchApplication()
+        this.fetchAppliedCompanys()
     },
     methods: {
-        async fetchApplication() {
+        async fetchAppliedCompanys() {
             // 중복 API 호출 block
-            if (this.isFetching) return
-            this.isFetching = true
+            if (this.isFetchingAll) return
+            this.isFetchingAll = true
             this.appliedCompanyList = []
 
             let param = {
@@ -93,7 +106,7 @@ export default {
                 pageSize: this.itemsPerPage,
                 order: '',
             }
-            console.log('status in function' + this.status)
+
             let param_ = `?serviceType=${param.serviceType}&status=${param.status}&page=${param.page}&pageSize=${param.pageSize}&order=${param.order}`
 
             let _headers = {
@@ -107,14 +120,42 @@ export default {
                     _headers
                 )
 
-                console.log('신청회사리스트', result)
+                console.log('신청회사리스트', result) // Response
                 let JSONdata = await result.json()
-                // console.log(JSONdata) // data 배열
+                console.log(JSONdata) // Jsondata.data 배열 data object 내 Array
                 this.totalPage = JSONdata.totalPage
                 this.appliedCompanyList.push(...JSONdata.data)
                 // console.log('마이데이터보기', this.appliedCompanyList)
-                return (this.isFetching = false)
+                return (this.isFetchingAll = false)
             } catch (error) {}
+        },
+        async fetchCompanyDetail(_idx) {
+            if (this.isFetchingDtl) return
+
+            this.isFetchingDtl = true
+            this.appliedCompanyDtl = []
+
+            let param = {
+                idx: _idx,
+            }
+            let paramValue = `?idx=${param.idx}`
+
+            try {
+                let result = await this.$store.dispatch('fetchDetail', paramValue)
+
+                let JSONdata = await result.json()
+
+                this.appliedCompanyDtl.push(JSONdata.data) //  JSONdata 1개 Array  X
+
+                this.openDialog = true
+
+                console.log('회사디테일', JSONdata) //
+                return
+            } catch (error) {
+                console.log('error', error)
+            }
+
+            this.isFetchingDtl = false
         },
         getStatusClass(status) {
             switch (status) {
@@ -131,12 +172,15 @@ export default {
         async filterByStatus(buttonValue) {
             this.currentPage = 1
             this.status = buttonValue
-            this.fetchApplication()
+            this.fetchAppliedCompanys()
         },
     },
 }
 </script>
 <style>
+#apply-admin-page {
+    min-width: 990px;
+}
 .awaiting-class {
     background-color: brown;
 }
@@ -148,5 +192,10 @@ export default {
 }
 .cancelled-class {
     background-color: grey;
+}
+</style>
+<style scoped>
+tbody tr:hover {
+    cursor: pointer;
 }
 </style>
