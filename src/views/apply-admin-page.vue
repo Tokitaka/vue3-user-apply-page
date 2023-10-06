@@ -1,6 +1,6 @@
 <template>
     <div id="apply-admin-page">
-        <v-row>
+        <v-row class="mb-0">
             <v-col>
                 <h2>세이피안 신청 관리</h2>
             </v-col>
@@ -14,10 +14,10 @@
         <v-spacer></v-spacer>
         <v-row>
             <v-col>
-                <v-btn @click="filterByStatus('not_started')">Not Started</v-btn>
-                <v-btn @click="filterByStatus('in_progress')">In Progress</v-btn>
-                <v-btn @click="filterByStatus('completed')">Completed</v-btn>
-                <v-btn @click="filterByStatus('cancelled')">Cancelled</v-btn>
+                <v-btn @click="filterByStatus('not_started')"> 신 청 </v-btn>
+                <v-btn @click="filterByStatus('in_progress')"> 진 행 중 </v-btn>
+                <v-btn @click="filterByStatus('completed')"> 완 료 </v-btn>
+                <v-btn @click="filterByStatus('cancelled')"> 취 소 </v-btn>
             </v-col>
         </v-row>
         <v-row>
@@ -53,7 +53,11 @@
                 </v-table>
             </v-col>
         </v-row>
-        <detail-dialog :open-modal="openDialog" :applied-company-dtl="appliedCompanyDtl"></detail-dialog>
+        <detail-dialog
+            :is-open="dialog"
+            :applied-company-dtl="appliedCompanyDtl"
+            @close-dialog="closeDialog"
+        ></detail-dialog>
     </div>
 </template>
 <script>
@@ -73,26 +77,40 @@ export default {
     data() {
         return {
             appliedCompanyList: [],
-            appliedCompanyDtl: [],
+            appliedCompanyDtl: {},
             isFetchingAll: false,
-            isFetchingDtl: false,
             serviceType: '',
             status: '',
             currentPage: 1,
-            itemsPerPage: 12,
+            itemsPerPage: 10,
             totalPage: 0,
-            openDialog: false,
+            dialog: false,
         }
     },
     watch: {
         currentPage(newValue, oldValue) {
             this.fetchAppliedCompanys()
         },
+        appliedCompanyDtl(newValue, oldValue) {
+            console.log('newValue', newValue, 'oldValue', oldValue)
+        },
     },
     created() {
         this.fetchAppliedCompanys()
     },
     methods: {
+        convertStatus(status) {
+            switch (status) {
+                case 'not_started':
+                    return '신청'
+                case 'in_progress':
+                    return '진행중'
+                case 'completed':
+                    return '완료'
+                case 'cancelled':
+                    return '취소'
+            }
+        },
         async fetchAppliedCompanys() {
             // 중복 API 호출 block
             if (this.isFetchingAll) return
@@ -107,34 +125,24 @@ export default {
                 order: '',
             }
 
-            let param_ = `?serviceType=${param.serviceType}&status=${param.status}&page=${param.page}&pageSize=${param.pageSize}&order=${param.order}`
+            let paramValue = `?serviceType=${param.serviceType}&status=${param.status}&page=${param.page}&pageSize=${param.pageSize}&order=${param.order}`
 
-            let _headers = {
-                'admin-code': ADMIN_CODE,
-            }
             try {
-                let result = await utils.ajaxFetchJson(
-                    _xurl.getAppliedCompany + param_,
-                    'GET',
-                    null,
-                    _headers
-                )
+                let result = await this.$store.dispatch('fetchList', paramValue)
 
-                console.log('신청회사리스트', result) // Response
                 let JSONdata = await result.json()
-                console.log(JSONdata) // Jsondata.data 배열 data object 내 Array
+
                 this.totalPage = JSONdata.totalPage
-                this.appliedCompanyList.push(...JSONdata.data)
-                // console.log('마이데이터보기', this.appliedCompanyList)
+
+                let cvAppliedCompanyList = JSONdata.data.map((item) => ({
+                    ...item,
+                    status: this.convertStatus(item.status),
+                }))
+                this.appliedCompanyList.push(...cvAppliedCompanyList)
                 return (this.isFetchingAll = false)
             } catch (error) {}
         },
         async fetchCompanyDetail(_idx) {
-            if (this.isFetchingDtl) return
-
-            this.isFetchingDtl = true
-            this.appliedCompanyDtl = []
-
             let param = {
                 idx: _idx,
             }
@@ -145,28 +153,14 @@ export default {
 
                 let JSONdata = await result.json()
 
-                this.appliedCompanyDtl.push(JSONdata.data) //  JSONdata 1개 Array  X
+                this.appliedCompanyDtl = JSONdata.data
+                this.appliedCompanyDtl.status = this.convertStatus(this.appliedCompanyDtl.status)
+                console.log('status 확인', this.appliedCompanyDtl.status)
+                console.log('회사디테일', this.appliedCompanyDtl) //
 
-                this.openDialog = true
-
-                console.log('회사디테일', JSONdata) //
-                return
+                return (this.dialog = true)
             } catch (error) {
                 console.log('error', error)
-            }
-
-            this.isFetchingDtl = false
-        },
-        getStatusClass(status) {
-            switch (status) {
-                case 'not_started':
-                    return 'awaiting-class'
-                case 'in_progress':
-                    return 'in-progress-class'
-                case 'completed':
-                    return 'completed-class'
-                case 'cancelled':
-                    return 'cancelled-class'
             }
         },
         async filterByStatus(buttonValue) {
@@ -174,28 +168,55 @@ export default {
             this.status = buttonValue
             this.fetchAppliedCompanys()
         },
+        getStatusClass(status) {
+            switch (status) {
+                case '신청':
+                    return 'awaiting-class'
+                case '진행중':
+                    return 'in-progress-class'
+                case '완료':
+                    return 'completed-class'
+                case '취소':
+                    return 'cancelled-class'
+            }
+        },
+        closeDialog() {
+            this.dialog = false
+        },
     },
 }
 </script>
 <style>
 #apply-admin-page {
     min-width: 990px;
+    margin-top: 0px;
 }
 .awaiting-class {
-    background-color: brown;
+    text-align: center;
+    background-color: #a52a2a;
 }
 .in-progress-class {
-    background-color: blue;
+    text-align: center;
+    background-color: #0000ff;
 }
 .completed-class {
-    background-color: green;
+    text-align: center;
+    background-color: #008000;
 }
 .cancelled-class {
-    background-color: grey;
+    text-align: center;
+    background-color: #808080;
 }
 </style>
 <style scoped>
 tbody tr:hover {
     cursor: pointer;
+}
+button {
+    width: calc(40vw / 4);
+    font-size: 17px;
+    margin-left: 5px;
+    /* border-radius: 0px; */
+    border: 1px solid darkgrey;
 }
 </style>
