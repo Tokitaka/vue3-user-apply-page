@@ -41,35 +41,49 @@
                                 <!-- wrap up -->
                                 <v-col cols="4">
                                     <v-file-input
-                                        v-model="uploadedFile"
+                                        v-model="form.localCompanyFile"
                                         label="사업자등록증*"
                                         clearable
                                         chips
                                         accept="image/*, .pdf, .zip"
-                                        @change="uploadImages"
                                     >
                                     </v-file-input>
                                     <ol style="display: flex; flex-direction: row">
+                                        <!-- db 파일 미리보기 -->
+                                        <li
+                                            v-for="(file, index) in appliedCompanyDtl.companyFile"
+                                            :key="index"
+                                        >
+                                            <div>
+                                                <v-btn class="ma-2" color="red" @click="deleteFile(index)">
+                                                    삭제
+                                                </v-btn>
+                                                <img
+                                                    :src="`http://safeean.club/${file}`"
+                                                    alt=""
+                                                    style="
+                                                        width: 300px;
+                                                        margin-right: 10px;
+                                                        border-radius: 2px;
+                                                    "
+                                                />
+                                            </div>
+                                        </li>
+                                        <!-- 새로 등록한 파일 미리보기 -->
                                         <li v-for="(file, index) in form.localCompanyFile" :key="index">
                                             <div>
-                                                <div>
-                                                    <v-btn
-                                                        class="ma-2"
-                                                        color="red"
-                                                        @click="deleteFile(index)"
-                                                    >
-                                                        삭제
-                                                    </v-btn>
-                                                    <img
-                                                        :src="`http://safeean.club/${file}`"
-                                                        alt=""
-                                                        style="
-                                                            width: 300px;
-                                                            margin-right: 10px;
-                                                            border-radius: 2px;
-                                                        "
-                                                    />
-                                                </div>
+                                                <v-btn class="ma-2" color="red" @click="deleteFile(index)">
+                                                    삭제
+                                                </v-btn>
+                                                <img
+                                                    :src="previewImg(file)"
+                                                    alt=""
+                                                    style="
+                                                        width: 300px;
+                                                        margin-right: 10px;
+                                                        border-radius: 2px;
+                                                    "
+                                                />
                                             </div>
                                         </li>
                                     </ol>
@@ -135,8 +149,6 @@
     </div>
 </template>
 <script>
-import { uploadImages } from '@/utils/functions'
-
 export default {
     props: {
         appliedCompanyDtl: Object,
@@ -147,7 +159,6 @@ export default {
     },
     data() {
         return {
-            uploadedFile: [],
             form: {
                 localCompanyName: '',
                 localCompanyCEO: '',
@@ -175,37 +186,52 @@ export default {
     watch: {
         appliedCompanyDtl: {
             handler(newVal, oldVal) {
-                // appliedCompanyDtl이 변경될 때마다 form을 업데이트
                 this.form.localCompanyName = newVal.companyName
                 this.form.localCompanyCEO = newVal.companyCEO
                 this.form.localCompanyCode = newVal.companyCode
 
-                this.form.localCompanyFile = []
-                this.form.localCompanyFile.push(newVal.companyFile)
+                // this.form.localCompanyFile = []
+                console.log('호출됨')
 
                 this.form.localCompanyTEL = newVal.companyTEL
-                this.form.localCompanyEmail = newVal.companyEmail
+                this.form.localCompanyEmail = newVal.localCompanyEmail
                 this.form.localContent = newVal.content
                 this.form.localStatus = newVal.status
                 this.form.localServiceType = newVal.serviceType
             },
-            immediate: true, // 컴포넌트가 생성될 때도 즉시 적용
+            immediate: true,
         },
     },
     methods: {
         childCloseDialog() {
             this.$emit('closeDialog')
         },
-        uploadImages(event) {
-            this.form.localCompanyFile.push(this.uploadedFile[0].name)
-            console.log('새로운 파일 확인', this.form.localCompanyFile)
-        },
+        // uploadImages(event) {
+        //     this.form.localCompanyFile.push(this.uploadedFile[0].name)
+        //     console.log('새로운 파일 확인', this.form.localCompanyFile)
+        // },
         deleteFile(index) {
             this.form.localCompanyFile.splice(index)
         },
         childUpdateCompanyDtl() {
             this.$emit('closeDialog')
             this.$emit('updateCompanyDtl', this.form)
+        },
+        previewImg(file) {
+            new Promise((resolve, reject) => {
+                const reader = new FileReader()
+
+                reader.onload = () => {
+                    const dataURL = reader.result
+                    resolve(dataURL)
+                }
+
+                reader.onerror = (error) => {
+                    reject(error)
+                }
+
+                return reader.readAsDataURL(file)
+            })
         },
     },
 }
