@@ -57,6 +57,7 @@
             :is-open="dialog"
             :applied-company-dtl="appliedCompanyDtl"
             @close-dialog="closeDialog"
+            @update-company-dtl="updateCompanyDtl"
         ></detail-dialog>
     </div>
 </template>
@@ -111,6 +112,20 @@ export default {
                     return '취소'
             }
         },
+        convertServiceType(serviceTypes) {
+            return serviceTypes.map((type) => {
+                switch (type) {
+                    case 'food':
+                        return '세이피안'
+                    case 'dining':
+                        return '세이피안다이닝'
+                    case 'school':
+                        return '세이피안스쿨'
+                    case 'meals':
+                        return '세이피안밀즈'
+                }
+            })
+        },
         async fetchAppliedCompanys() {
             // 중복 API 호출 block
             if (this.isFetchingAll) return
@@ -154,9 +169,18 @@ export default {
                 let JSONdata = await result.json()
 
                 this.appliedCompanyDtl = JSONdata.data
+
+                if (this.appliedCompanyDtl.companyFile === null) {
+                    this.appliedCompanyDtl.companyFile = ''
+                }
                 this.appliedCompanyDtl.status = this.convertStatus(this.appliedCompanyDtl.status)
-                console.log('status 확인', this.appliedCompanyDtl.status)
-                console.log('회사디테일', this.appliedCompanyDtl) //
+
+                this.appliedCompanyDtl.serviceType = this.convertServiceType(
+                    this.appliedCompanyDtl.serviceType
+                )
+                // await this.$store.dispatch('fetchImage')
+                console.log('localCompanyFile 확인', this.appliedCompanyDtl.companyFile)
+                console.log('회사디테일', this.appliedCompanyDtl)
 
                 return (this.dialog = true)
             } catch (error) {
@@ -182,6 +206,15 @@ export default {
         },
         closeDialog() {
             this.dialog = false
+        },
+        async updateCompanyDtl(formData) {
+            console.log('formData 확인', formData)
+            // body 값 formData ?
+            let result = await this.$store.dispatch('editDetail', formData)
+
+            let JSONdata = await result.json()
+
+            this.totalPage = JSONdata.totalPage
         },
     },
 }

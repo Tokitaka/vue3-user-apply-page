@@ -106,7 +106,7 @@
                                         show-size
                                         accept="image/*, .pdf, .zip"
                                         :hide-details="hideDetails"
-                                        :rules="[rules.required]"
+                                        :rules="[rules.file]"
                                     >
                                         <template #append>
                                             <v-expand-x-transition>
@@ -285,6 +285,10 @@ export default {
                 //         // '파일은 3개까지만 업로드 가능합니다.'
                 //     }
                 // },
+                file: (value) => {
+                    if (!value) return '파일을 선택하세요'
+                    if (typeof value === 'string') return (value = '')
+                },
                 onlyChar: (value) => {
                     const regex = /^[a-zA-Z]+$/
                     return regex.test(value) ? true : false
@@ -457,6 +461,9 @@ export default {
 .apply-user-page {
     width: 93%;
     margin: 0 auto;
+}
+.apply-user-page .v-messages {
+    text-align: left;
 }
 .intro-card {
     margin-top: 15px;

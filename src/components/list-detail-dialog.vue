@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-row>
-            <v-dialog :model-value="isOpen" activator="" persistent width="1024">
+            <v-dialog :model-value="isOpen" activator="" persistent>
                 <!-- <template #activator="{ on, attrs }">
                     <v-btn color="primary" dark v-bind="attrs" v-on="on"> Open Dialog </v-btn>
                 </template> -->
@@ -40,12 +40,39 @@
                                 </v-col>
                                 <!-- wrap up -->
                                 <v-col cols="4">
-                                    <v-input-field
-                                        v-model="form.localCompanyFile"
+                                    <v-file-input
+                                        v-model="uploadedFile"
                                         label="사업자등록증*"
-                                        required
                                         clearable
-                                    ></v-input-field>
+                                        chips
+                                        accept="image/*, .pdf, .zip"
+                                        @change="uploadImages"
+                                    >
+                                    </v-file-input>
+                                    <ol style="display: flex; flex-direction: row">
+                                        <li v-for="(file, index) in form.localCompanyFile" :key="index">
+                                            <div>
+                                                <div>
+                                                    <v-btn
+                                                        class="ma-2"
+                                                        color="red"
+                                                        @click="deleteFile(index)"
+                                                    >
+                                                        삭제
+                                                    </v-btn>
+                                                    <img
+                                                        :src="`http://safeean.club/${file}`"
+                                                        alt=""
+                                                        style="
+                                                            width: 300px;
+                                                            margin-right: 10px;
+                                                            border-radius: 2px;
+                                                        "
+                                                    />
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ol>
                                 </v-col>
                                 <v-col cols="4">
                                     <v-text-field
@@ -82,16 +109,13 @@
                                 <v-col cols="6">
                                     <v-autocomplete
                                         v-model="form.localServiceType"
-                                        :items="[
-                                            '세이피안',
-                                            '세이피안다이닝',
-                                            '세이피안스쿨',
-                                            '세이피안밀즈',
-                                        ]"
+                                        :items="filteredServiceTypes"
                                         label="신청서비스*"
                                         multiple
                                         required
                                         clearable
+                                        item-title="name"
+                                        item-value="name"
                                     ></v-autocomplete>
                                 </v-col>
                             </v-row>
@@ -101,7 +125,9 @@
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="blue-darken-1" variant="text" @click="childCloseDialog"> Close </v-btn>
-                        <v-btn color="blue-darken-1" variant="text" @click="updateDialog"> Save </v-btn>
+                        <v-btn color="blue-darken-1" variant="text" @click="childUpdateCompanyDtl">
+                            Save
+                        </v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>
@@ -109,6 +135,8 @@
     </div>
 </template>
 <script>
+import { uploadImages } from '@/utils/functions'
+
 export default {
     props: {
         appliedCompanyDtl: Object,
@@ -119,18 +147,30 @@ export default {
     },
     data() {
         return {
+            uploadedFile: [],
             form: {
                 localCompanyName: '',
                 localCompanyCEO: '',
                 localCompanyCode: '',
-                localCompanyFile: '',
+                localCompanyFile: [],
                 localCompanyTEL: '',
                 localCompanyEmail: '',
                 localContent: '',
                 localStatus: '',
                 localServiceType: '',
             },
+            serviceTypes: [
+                { name: '세이피안', disabled: false },
+                { name: '세이피안다이닝', disabled: false },
+                { name: '세이피안스쿨', disabled: true },
+                { name: '세이피안밀즈', disabled: true },
+            ],
         }
+    },
+    computed: {
+        filteredServiceTypes() {
+            return this.serviceTypes.filter((item) => !item.disabled)
+        },
     },
     watch: {
         appliedCompanyDtl: {
@@ -139,7 +179,10 @@ export default {
                 this.form.localCompanyName = newVal.companyName
                 this.form.localCompanyCEO = newVal.companyCEO
                 this.form.localCompanyCode = newVal.companyCode
-                this.form.localCompanyFile = newVal.companyFile
+
+                this.form.localCompanyFile = []
+                this.form.localCompanyFile.push(newVal.companyFile)
+
                 this.form.localCompanyTEL = newVal.companyTEL
                 this.form.localCompanyEmail = newVal.companyEmail
                 this.form.localContent = newVal.content
@@ -153,8 +196,22 @@ export default {
         childCloseDialog() {
             this.$emit('closeDialog')
         },
-        updateDialog() {},
+        uploadImages(event) {
+            this.form.localCompanyFile.push(this.uploadedFile[0].name)
+            console.log('새로운 파일 확인', this.form.localCompanyFile)
+        },
+        deleteFile(index) {
+            this.form.localCompanyFile.splice(index)
+        },
+        childUpdateCompanyDtl() {
+            this.$emit('closeDialog')
+            this.$emit('updateCompanyDtl', this.form)
+        },
     },
 }
 </script>
-<style></style>
+<style scoped>
+.v-card {
+    width: 1074px;
+}
+</style>

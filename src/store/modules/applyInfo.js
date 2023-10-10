@@ -14,6 +14,12 @@ const actions = {
         }
         return await utils.ajaxFetchJson(_xurl.getAppliedDetail + param, 'GET', null, headers)
     },
+    async editDetail(context, data) {
+        let headers = {
+            'admin-code': process.env.VUE_APP_ADMIN_CODE,
+        }
+        return await utils.ajaxFetchJson(_xurl.editApplication, 'PATCH', data, headers)
+    },
 }
 
 export default { actions }
