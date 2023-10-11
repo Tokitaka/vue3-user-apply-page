@@ -354,9 +354,16 @@ export default {
                         return
                     }
                 }
-
+                // TODO-Review : 체크박스 유효성 체크
+                let isValidCheckbox = this.form.serviceType.food || this.form.serviceType.dining
+                if (!isValidCheckbox) {
+                    this.informContent = '신청할 서비스를 선택해주세요.'
+                    this.$refs.inform.inform().then((res) => {})
+                    this.onLoading = false
+                    return
+                }
                 // image upload
-                if (this.companyFileOrig) {
+                if (this.companyFileOrig && Object.keys(this.companyFileOrig).length > 0) {
                     console.log('파일원본 확인', this.companyFileOrig)
                     let Imagedata = {
                         images: this.companyFileOrig,
@@ -384,6 +391,11 @@ export default {
                             console.log('image path 확인', imagePath)
                             this.form.companyFile.push(imagePath)
                         }
+                    } else {
+                        this.informContent = '파일을 선택해주세요.'
+                        this.$refs.inform.inform().then((res) => {})
+                        this.onLoading = false
+                        return
                     }
                 }
 
