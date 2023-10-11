@@ -14,6 +14,7 @@
         <v-spacer></v-spacer>
         <v-row>
             <v-col>
+                <v-btn @click="filterByStatus"> 전체보기 </v-btn>
                 <v-btn @click="filterByStatus('not_started')"> 신 청 </v-btn>
                 <v-btn @click="filterByStatus('in_progress')"> 진 행 중 </v-btn>
                 <v-btn @click="filterByStatus('completed')"> 완 료 </v-btn>
@@ -228,7 +229,7 @@ export default {
             this.onLoading = true
             console.log('formData 확인', formData)
             // image Upload & get filePath
-            if (formData.companyFile && formData.companyFile.length > 0) {
+            if (formData.companyFile && Object.keys(formData.companyFile).length > 0) {
                 let Imagedata = {
                     images: formData.companyFile,
                     options: {
@@ -263,11 +264,15 @@ export default {
                 }
             }
             // serviceType, status 변환
-            formData.status = this.convertStatus(formData.status)
-            console.log(formData.status)
-            formData.serviceType = this.convertServiceType(formData.serviceType)
-            console.log(formData.serviceType)
+            if (formData.status) {
+                formData.status = this.convertStatus(formData.status)
+                console.log(formData.status)
+            }
 
+            if (formData.serviceType && Object.keys(formData.serviceType).length > 0) {
+                formData.serviceType = this.convertServiceType(formData.serviceType)
+                console.log(formData.serviceType)
+            }
             // Patch Data
             let result = await this.$store.dispatch('editDetail', formData)
             console.log('editDetail', result)
