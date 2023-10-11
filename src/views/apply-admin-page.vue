@@ -59,6 +59,8 @@
             @close-dialog="closeDialog"
             @update-company-dtl="updateCompanyDtl"
         ></detail-dialog>
+        <Loader :onLoading="onLoading"></Loader>
+        <informModal ref="inform" :content="informContent" time="5" />
     </div>
 </template>
 <script>
@@ -68,15 +70,15 @@ import detailDialog from '@/components/list-detail-dialog.vue'
 import informModal from '@/components/inform-modal.vue'
 import Loader from '@/components/Loader.vue'
 
-// const ADMIN_CODE = process.env.ADMIN_CODE
-const ADMIN_CODE = process.env.VUE_APP_ADMIN_CODE
-
 export default {
     components: {
         detailDialog,
+        Loader,
+        informModal,
     },
     data() {
         return {
+            onLoading: false,
             appliedCompanyList: [],
             appliedCompanyDtl: {},
             isFetchingAll: false,
@@ -110,6 +112,14 @@ export default {
                     return '완료'
                 case 'cancelled':
                     return '취소'
+                case '신청':
+                    return 'not_started'
+                case '진행중':
+                    return 'in_progress'
+                case '완료':
+                    return 'completed'
+                case '취소':
+                    return 'cancelled'
             }
         },
         convertServiceType(serviceTypes) {
@@ -123,6 +133,14 @@ export default {
                         return '세이피안스쿨'
                     case 'meals':
                         return '세이피안밀즈'
+                    case '세이피안':
+                        return 'food'
+                    case '세이피안다이닝':
+                        return 'dining'
+                    case '세이피안스쿨':
+                        return 'school'
+                    case '세이피안밀즈':
+                        return 'meals'
                 }
             })
         },
@@ -178,7 +196,6 @@ export default {
                 this.appliedCompanyDtl.serviceType = this.convertServiceType(
                     this.appliedCompanyDtl.serviceType
                 )
-                // await this.$store.dispatch('fetchImage')
                 console.log('localCompanyFile 확인', this.appliedCompanyDtl.companyFile)
                 console.log('회사디테일', this.appliedCompanyDtl)
 
@@ -208,13 +225,65 @@ export default {
             this.dialog = false
         },
         async updateCompanyDtl(formData) {
+            this.onLoading = true
             console.log('formData 확인', formData)
-            // body 값 formData ?
+            // image Upload & get filePath
+            if (formData.companyFile && formData.companyFile.length > 0) {
+                let Imagedata = {
+                    images: formData.companyFile,
+                    options: {
+                        path: formData.companyCode,
+                    },
+                }
+                let result = await utils.uploadImages(Imagedata)
+                console.log('image upload', result)
+                let resultData = await result.json()
+
+                if (!result?.ok && !resultData?.success) {
+                    console.log('이미지 업로드 실패')
+                    this.informContent = '잠시후에 다시 시도해주세요'
+                    this.$refs.inform.inform().then((res) => {})
+                    this.onLoading = false
+                    return
+                }
+                console.log('upload된 파일 보기', resultData)
+                console.log('path 추가')
+                // path 추가
+                if (resultData?.data) {
+                    for (const item of resultData.data) {
+                        let imagePath = item.path
+                        console.log('image path 확인', imagePath)
+                        formData.companyFile.push(imagePath)
+                    }
+                } else {
+                    this.informContent = '파일을 선택해주세요.'
+                    this.$refs.inform.inform().then((res) => {})
+                    this.onLoading = false
+                    return
+                }
+            }
+            // serviceType, status 변환
+            formData.status = this.convertStatus(formData.status)
+            console.log(formData.status)
+            formData.serviceType = this.convertServiceType(formData.serviceType)
+            console.log(formData.serviceType)
+
+            // Patch Data
             let result = await this.$store.dispatch('editDetail', formData)
+            console.log('editDetail', result)
+
+            this.onLoading = false
+
+            if (!result.ok) {
+                console.log('폼 제출 실패')
+                this.informContent = '잠시후에 다시 시도해주세요'
+                this.$refs.inform.inform().then((res) => {})
+                this.onLoading = false
+                return
+            }
 
             let JSONdata = await result.json()
-
-            this.totalPage = JSONdata.totalPage
+            console.log('submitForm데이터 보기', JSONdata)
         },
     },
 }

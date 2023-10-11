@@ -364,7 +364,6 @@ export default {
                 }
                 // image upload
                 if (this.companyFileOrig && Object.keys(this.companyFileOrig).length > 0) {
-                    console.log('파일원본 확인', this.companyFileOrig)
                     let Imagedata = {
                         images: this.companyFileOrig,
                         options: {
