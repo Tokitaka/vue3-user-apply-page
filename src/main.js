@@ -9,4 +9,6 @@ app.use(vuetify)
 app.use(router)
 app.use(store)
 
+app.config.globalProperties.imageUrl = process.env.VUE_APP_IMG_URL
+
 app.mount('#app')

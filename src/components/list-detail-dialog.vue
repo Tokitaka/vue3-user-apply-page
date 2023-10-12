@@ -60,12 +60,8 @@
                                                     v-for="(file, index) in appliedCompanyDtl.companyFile"
                                                     :key="index"
                                                 >
-                                                    <a
-                                                        :href="`http://safeean.club${file}`"
-                                                        download
-                                                        target="_blank"
-                                                    >
-                                                        http://safeean.club{{ file }}
+                                                    <a :href="`${imageUrl}${file}`" download target="_blank">
+                                                        {{ imageUrl + file }}
                                                     </a>
                                                 </div>
                                             </div>
