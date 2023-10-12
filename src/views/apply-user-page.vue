@@ -106,7 +106,6 @@
                                         show-size
                                         accept="image/*, .pdf, .zip"
                                         :hide-details="hideDetails"
-                                        :rules="[rules.file]"
                                     >
                                         <template #append>
                                             <v-expand-x-transition>
@@ -198,16 +197,6 @@
                                         :rules="[rules.required, rules.email]"
                                         style=""
                                     >
-                                        <template #append>
-                                            <v-expand-x-transition>
-                                                <v-icon
-                                                    v-show="rules.email(form.companyEmail)"
-                                                    color="success"
-                                                >
-                                                    mdi-check
-                                                </v-icon>
-                                            </v-expand-x-transition>
-                                        </template>
                                     </v-text-field>
                                 </v-col>
                             </v-row>
@@ -222,11 +211,12 @@
                                     <div class="input-title-items">
                                         <v-checkbox
                                             v-model="form.serviceType.food"
-                                            label="세이피안"
+                                            label="세이피안푸드"
                                             style="color: black"
                                             hide-details
                                         >
                                         </v-checkbox>
+
                                         <v-checkbox
                                             v-model="form.serviceType.dining"
                                             label="세이피안다이닝"
@@ -234,6 +224,7 @@
                                             hide-details
                                         >
                                         </v-checkbox>
+
                                         <v-checkbox
                                             v-model="form.serviceType.school"
                                             label="세이피안스쿨"
@@ -285,10 +276,6 @@ export default {
                 //         // '파일은 3개까지만 업로드 가능합니다.'
                 //     }
                 // },
-                file: (value) => {
-                    if (!value) return '파일을 선택하세요'
-                    if (typeof value === 'string') return (value = '')
-                },
                 onlyChar: (value) => {
                     const regex = /^[a-zA-Z]+$/
                     return regex.test(value) ? true : false
@@ -390,14 +377,13 @@ export default {
                             console.log('image path 확인', imagePath)
                             this.form.companyFile.push(imagePath)
                         }
-                    } else {
-                        this.informContent = '파일을 선택해주세요.'
-                        this.$refs.inform.inform().then((res) => {})
-                        this.onLoading = false
-                        return
                     }
+                } else {
+                    this.informContent = '파일을 선택해주세요.'
+                    this.$refs.inform.inform().then((res) => {})
+                    this.onLoading = false
+                    return
                 }
-
                 let formData = {
                     companyName: this.form.companyName,
                     companyCEO: this.form.companyCEO,
