@@ -2,27 +2,32 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import applyUserPage from '@/views/apply-user-page'
 import applyCompletePage from '@/views/apply-complete-page'
-import applyAdminPage from '@/views/apply-admin-page'
-import applyAdminMobile from '@/views/apply-admin-mobile'
+import applyAdminPage from '@/views/admin-vr1-web/apply-admin-page'
+import adminMobileMain from '@/views/admin-vr2-mobile/admin-mobile-main'
+import adminMobileLogin from '@/views/admin-vr2-mobile/admin-mobile-login'
 
 const baseUrl = process.env.VUE_APP_BASE_URL
 console.log('baseURL 확인', baseUrl)
 const routes = [
     {
-        path: '/apply',
+        path: baseUrl + '/apply',
         component: applyUserPage,
     },
     {
-        path: '/apply/complete',
+        path: baseUrl + '/apply/complete',
         component: applyCompletePage,
     },
     {
-        path: '/admin',
+        path: baseUrl + '/admin',
         component: applyAdminPage,
     },
     {
-        path: '/admin/mobile',
-        component: applyAdminMobile,
+        path: baseUrl + 'admin/mobile/login',
+        component: adminMobileLogin,
+    },
+    {
+        path: baseUrl + 'admin/mobile/main',
+        component: adminMobileMain,
     },
 ]
 
